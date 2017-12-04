@@ -31,3 +31,12 @@ make proceso id=0 n=3 delay=5000 bearer=false
 
 * Todos los procesos están online cuando inicia el algoritmo, por esto se añadió un delay de 10 segundos, para que así se abran todas las intancias de procesos y después de eso empieza a operar el proceso
 * Se modificó la firma original de la función ```waitToken()``` a ```waitToken(int id)```, esto se hizo con la finalidad de que el proceso que ejecute ```waitToken()``` se quede esperando (el token) y abra un socket Unicast en la dirección 5000 + id desde el lado del rmi
+
+### Estrategia
+* El arreglo **RN** es una lista que vive en los procesos
+* El arreglo **LN** y la **Cola** viven en el Token.
+* Los métodos ``request()``, ``waitToken``, ``takeToken`` y ``Kill`` fueron implementados en el objeto rmi **app**.
+* Existe un único Token, este parte inicialmente en el proceso con el flag ``bearer=true`` , una vez este termine su zona crítica, hará todo el procedimiento de añadir nuevos procesos a la cola y esperará hasta que haya alguíen a quíen pasarle el token (alguien en la cola) y ejecutará el método ``takeToken``.
+* Cada proceso tiene un Thread destinado a escuchar y procesar las request provenientes de los otros procesos, se aceptan o se rechazan según la regla del algoritmo.
+
+Para más detalle se recomienda leer los comentarios del código.
