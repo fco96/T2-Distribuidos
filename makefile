@@ -11,8 +11,11 @@ all: clases
 
 clases: $(classes)
 
-cliente:
-	java -Djava.security.policy=permisos cliente $(id) $(n) $(initialDelay) $(bearer)
+proceso:
+	java -Djava.security.policy=permisos Proceso $(id) $(n) $(initialDelay) $(bearer)
+
+app:
+	java -Djava.security.policy=permisos appImp
 
 clean :
 	rm -f *.class
