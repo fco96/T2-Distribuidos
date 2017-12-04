@@ -5,6 +5,7 @@ import java.net.MulticastSocket;
 import java.rmi.Naming;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class Proceso {
     static int id, n, delay;
@@ -12,6 +13,9 @@ public class Proceso {
     static Boolean bearer;
     static int sequenceNumber = 0;
     public static void main(String[] args){
+        Log myLog = null;
+
+
         Token t = null;
         String color = "Verde";
         //Se parsean los elementos de entrada
@@ -31,6 +35,16 @@ public class Proceso {
         for(int i=0; i<n; i++){
             RN.add(0);
         }
+
+        //Se inicializa el log
+        try {
+            myLog = new Log("./logs/logP"+id);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        myLog.logger.setLevel(Level.INFO);
+        myLog.logger.info("Hola");
 
         try{
             //Se procede a pedir el token desde el RMI
@@ -127,6 +141,7 @@ public class Proceso {
                 System.out.println("[Proceso "+id+"] Le enviaré el token a: "+siguiente);
 
                 aplicacion.takeToken(t);
+                t = null;
             }
             threadIn.stop();
             System.out.println("[Proceso "+id+"] Fin de la ejecución.");
