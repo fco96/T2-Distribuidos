@@ -79,6 +79,13 @@ public class appImp extends UnicastRemoteObject implements app {
 
     @Override
     public void kill() throws RemoteException {
+        try{
+            Naming.unbind("//localhost:" + 8080 + "/app");
+            UnicastRemoteObject.unexportObject(this, true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //System.exit(0);
 
     }
 

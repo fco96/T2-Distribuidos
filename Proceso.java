@@ -13,6 +13,7 @@ public class Proceso {
     static int sequenceNumber = 0;
     public static void main(String[] args){
         Token t = null;
+        String color = "Verde";
         //Se parsean los elementos de entrada
         id = Integer.parseInt(args[0]);
         n = Integer.parseInt(args[1]);
@@ -25,7 +26,7 @@ public class Proceso {
         }
 
         System.out.println("Estado Inicial: id: "+id+", n: "+n+", delay: "+delay+", bearer: "+bearer);
-
+        System.out.println("[Proceso "+id+"] Color del semaforo: "+color);
         //Se inicializa la lista RN
         for(int i=0; i<n; i++){
             RN.add(0);
@@ -51,13 +52,24 @@ public class Proceso {
             //Caso en el que no parto con el token
             if (!bearer){
                 aplicacion.request(id, ++sequenceNumber);
+                color = "Amarillo";
+                System.out.println("[Proceso "+id+"] Color del semaforo: "+color);
+                System.out.println("[Proceso "+id+"] Se espera el token");
                 t = aplicacion.waitToken(id);
+                System.out.println("[Proceso "+id+"] Token recibido");
             }
 
+            Thread.sleep(1000*1);
+            color = "Rojo";
+            System.out.println("[Proceso "+id+"] Color del semaforo: "+color);
+            System.out.println("[Proceso "+id+"] Entrando en la zona crítica.");
             /*Se comienzan a realizar cosas de la zona crítica*/
 
 
             System.out.println("[Proceso "+id+"] Saliendo de la zona crítica.");
+
+            color = "Verde";
+            System.out.println("[Proceso "+id+"] Color del semaforo: "+color);
 
             /*Empieza el proceso de modificar LN, la cola y ver a quién le voy a mandar el token*/
 
@@ -90,6 +102,7 @@ public class Proceso {
 
             if (termino){
                 System.out.println("[Proceso "+id+"] Fin de la ejecución del algoritmo.");
+                aplicacion.kill();
             }
 
             else{
@@ -115,8 +128,9 @@ public class Proceso {
 
                 aplicacion.takeToken(t);
             }
-
+            threadIn.stop();
             System.out.println("[Proceso "+id+"] Fin de la ejecución.");
+            System.exit(0);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -169,8 +183,7 @@ public class Proceso {
 
                         if (seq > RN.get(idIn)){
                             RN.set(idIn, seq);
-                            System.out.println("[Proceso "+id+"] Petición aceptada.");
-                            System.out.println("RN:"+RN);
+                            System.out.println("[Proceso "+id+"] Petición aceptada, RN:"+RN);
                         }
                         else{
                             System.out.println("[Proceso "+id+"] Petición rechazada.");
