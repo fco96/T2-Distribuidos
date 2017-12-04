@@ -12,8 +12,9 @@ public class Proceso {
     static List<Integer> RN = new ArrayList<>();
     static Boolean bearer;
     static int sequenceNumber = 0;
+    static Log myLog = null;
     public static void main(String[] args){
-        Log myLog = null;
+
 
 
         Token t = null;
@@ -29,8 +30,7 @@ public class Proceso {
             bearer = false;
         }
 
-        System.out.println("Estado Inicial: id: "+id+", n: "+n+", delay: "+delay+", bearer: "+bearer);
-        System.out.println("[Proceso "+id+"] Color del semaforo: "+color);
+
         //Se inicializa la lista RN
         for(int i=0; i<n; i++){
             RN.add(0);
@@ -43,8 +43,10 @@ public class Proceso {
             e.printStackTrace();
         }
 
+        myLog.logger.info("Estado Inicial: id: "+id+", n: "+n+", delay: "+delay+", bearer: "+bearer);
+        myLog.logger.info("[Proceso "+id+"] Color del semaforo: "+color);
+
         myLog.logger.setLevel(Level.INFO);
-        myLog.logger.info("Hola");
 
         try{
             //Se procede a pedir el token desde el RMI
@@ -67,23 +69,23 @@ public class Proceso {
             if (!bearer){
                 aplicacion.request(id, ++sequenceNumber);
                 color = "Amarillo";
-                System.out.println("[Proceso "+id+"] Color del semaforo: "+color);
-                System.out.println("[Proceso "+id+"] Se espera el token");
+                myLog.logger.info("[Proceso "+id+"] Color del semaforo: "+color);
+                myLog.logger.info("[Proceso "+id+"] Se espera el token");
                 t = aplicacion.waitToken(id);
-                System.out.println("[Proceso "+id+"] Token recibido");
+                myLog.logger.info("[Proceso "+id+"] Token recibido");
             }
 
             Thread.sleep(1000*1);
             color = "Rojo";
-            System.out.println("[Proceso "+id+"] Color del semaforo: "+color);
-            System.out.println("[Proceso "+id+"] Entrando en la zona crítica.");
+            myLog.logger.info("[Proceso "+id+"] Color del semaforo: "+color);
+            myLog.logger.info("[Proceso "+id+"] Entrando en la zona crítica.");
             /*Se comienzan a realizar cosas de la zona crítica*/
 
 
-            System.out.println("[Proceso "+id+"] Saliendo de la zona crítica.");
+            myLog.logger.info("[Proceso "+id+"] Saliendo de la zona crítica.");
 
             color = "Verde";
-            System.out.println("[Proceso "+id+"] Color del semaforo: "+color);
+            myLog.logger.info("[Proceso "+id+"] Color del semaforo: "+color);
 
             /*Empieza el proceso de modificar LN, la cola y ver a quién le voy a mandar el token*/
 
@@ -105,7 +107,7 @@ public class Proceso {
 
             //Finalmente ahora debo de ver quién esta en el frente de la cola, para así enviarle el token
             int siguiente;
-            System.out.println("[Proceso "+id+"] Estado RN: "+RN+" "+t);
+            myLog.logger.info("[Proceso "+id+"] Estado RN: "+RN+" "+t);
 
             Boolean termino = true;
             for(int i=0; i<t.LN.size(); i++){
@@ -115,7 +117,7 @@ public class Proceso {
             }
 
             if (termino){
-                System.out.println("[Proceso "+id+"] Fin de la ejecución del algoritmo.");
+                myLog.logger.info("[Proceso "+id+"] Fin de la ejecución del algoritmo.");
                 aplicacion.kill();
             }
 
@@ -138,13 +140,13 @@ public class Proceso {
 
                 siguiente = t.Queue.get(0);
 
-                System.out.println("[Proceso "+id+"] Le enviaré el token a: "+siguiente);
+                myLog.logger.info("[Proceso "+id+"] Le enviaré el token a: "+siguiente);
 
                 aplicacion.takeToken(t);
                 t = null;
             }
             threadIn.stop();
-            System.out.println("[Proceso "+id+"] Fin de la ejecución.");
+            myLog.logger.info("[Proceso "+id+"] Fin de la ejecución.");
             System.exit(0);
 
         }catch (Exception e){
@@ -198,10 +200,10 @@ public class Proceso {
 
                         if (seq > RN.get(idIn)){
                             RN.set(idIn, seq);
-                            System.out.println("[Proceso "+id+"] Petición aceptada, RN:"+RN);
+                            myLog.logger.info("[Proceso "+id+"] Petición aceptada, RN:"+RN);
                         }
                         else{
-                            System.out.println("[Proceso "+id+"] Petición rechazada.");
+                            myLog.logger.info("[Proceso "+id+"] Petición rechazada.");
                         }
                     }
 
