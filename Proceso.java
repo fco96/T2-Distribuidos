@@ -57,7 +57,11 @@ public class Proceso {
             threadIn.start();
 
             //Se procede a dar tiempo a los procesos para que todos esten Online
-            Thread.sleep(1000*7);
+            Thread.sleep(1000*10);
+
+            /*Desde aquí en adelante comienza el intento de entrar en la zona crítica*/
+
+            Thread.sleep(delay);
 
             //Caso en el que tengo el token, entonces debo de mandar la petición e iniciar
             if (bearer){
@@ -75,12 +79,13 @@ public class Proceso {
                 myLog.logger.info("[Proceso "+id+"] Token recibido");
             }
 
+            //Le doy 1 segundo para que sincronize mensajes que vengan en curso antes de entrar a la zona crítica
             Thread.sleep(1000*1);
             color = "Rojo";
             myLog.logger.info("[Proceso "+id+"] Color del semaforo: "+color);
             myLog.logger.info("[Proceso "+id+"] Entrando en la zona crítica.");
-            /*Se comienzan a realizar cosas de la zona crítica*/
 
+            /*Se comienzan a realizar cosas de la zona crítica*/
 
             myLog.logger.info("[Proceso "+id+"] Saliendo de la zona crítica.");
 
@@ -109,6 +114,8 @@ public class Proceso {
             int siguiente;
             myLog.logger.info("[Proceso "+id+"] Estado RN: "+RN+" "+t);
 
+            //Antes de verificar cómo esta la cola, voy a ver si ya terminó el algoritmo, es decir todos pasaron
+            //1 vez satisfactoriamente por la ruta crítica
             Boolean termino = true;
             for(int i=0; i<t.LN.size(); i++){
                 if (t.LN.get(i) == 0){
@@ -116,11 +123,13 @@ public class Proceso {
                 }
             }
 
+            //En caso de que yo soy el último proceso debo de terminar el algoritmo
             if (termino){
                 myLog.logger.info("[Proceso "+id+"] Fin de la ejecución del algoritmo.");
                 aplicacion.kill();
             }
 
+            //Si es que no soy el último debo pasar el token al siguiente que lo requiera
             else{
                 //Si es que no hay nadie en la cola voy a retener el token, verificaré cada 1 segundo para mandarlo
                 while (t.Queue.size() == 0){
@@ -145,6 +154,7 @@ public class Proceso {
                 aplicacion.takeToken(t);
                 t = null;
             }
+            //Como se va a salir mato el thread que esta esuchando en el multiccast y después salgo con exit
             threadIn.stop();
             myLog.logger.info("[Proceso "+id+"] Fin de la ejecución.");
             System.exit(0);

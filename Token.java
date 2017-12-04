@@ -2,6 +2,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+//El token contiene 2 listas, 1 modela la lista LN del algoritmo S-K y Queue para la cola del siguiente proceso
+//que le toca el token
 public class Token implements Serializable{
     List<Integer> LN;
     List<Integer> Queue;
@@ -18,6 +20,7 @@ public class Token implements Serializable{
 
     }
 
+    //Metodo para poder printear comodamente el Token
     @Override
     public String toString() {
         return "LN: "+LN+" Cola: "+Queue;
